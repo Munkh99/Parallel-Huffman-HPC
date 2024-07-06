@@ -1,43 +1,31 @@
 #!/bin/bash
 
-# Path to the dictionary file
-dictionary="/usr/share/dict/words"
+# Path to your existing 10MB file
+SOURCE_FILE="file_10M.txt"
 
-# Function to generate a text file of a given size with human-readable text
-generate_text_file() {
-    local size="$1"
-    local filename="$2"
+# Define the sizes for the output files in bytes
+TARGET_SIZES=(128 256 512 1024 2048 4096)  # in MB
 
-    # Generate random text by repeatedly reading from the dictionary file
-    local current_size=0
-    while [[ $current_size -lt $size ]]; do
-        cat "$dictionary" >> "$filename"
-        current_size=$(stat -c %s "$filename")
+# Loop through each target size
+for SIZE_MB in "${TARGET_SIZES[@]}"
+do
+    # Calculate the target size in bytes
+    TARGET_SIZE=$((SIZE_MB * 1024 * 1024))
+
+    # Calculate how many times to repeat the source file to reach the target size
+    REPEAT=$(($TARGET_SIZE / $(stat -c %s "$SOURCE_FILE")))
+
+    # Output file name
+    OUTPUT_FILE="file_${SIZE_MB}M.txt"
+
+    # Create the output file by repeating the source file
+    echo "Generating ${SIZE_MB}MB file: $OUTPUT_FILE"
+    for ((i=0; i<$REPEAT; i++))
+    do
+        cat "$SOURCE_FILE" >> "$OUTPUT_FILE"
     done
-    # Truncate the file to the desired size
-    head -c "$size" "$filename" > "$filename.tmp" && mv "$filename.tmp" "$filename"
-}
 
-# # Generate 1MB text file
-# generate_text_file $((1024 * 1024)) "random_text_1mb.txt"
-# echo "Random text file generated: random_text_1mb.txt"
+    echo "File generated: $OUTPUT_FILE"
+done
 
-# # Generate 10MB text file
-# generate_text_file $((10 * 1024 * 1024)) "random_text_10mb.txt"
-# echo "Random text file generated: random_text_10mb.txt"
-
-# Generate 100MB text file
-# generate_text_file $((100 * 1024 * 1024)) "random_text_100mb.txt"
-# echo "Random text file generated: random_text_100mb.txt"
-
-# Generate 100MB text file
-# generate_text_file $((600 * 1024 * 1024)) "random_text_600mb.txt"
-# echo "Random text file generated: random_text_600mb.txt"
-
-# Generate 1GB text file
-generate_text_file $((1024 * 1024 * 1024)) "random_text_1gb.txt"
-echo "Random text file generated: random_text_1gb.txt"
-
-# Generate 10GB text file (This may take a while)
-# generate_text_file $((10 * 1024 * 1024 * 1024)) "random_text_10gb.txt"
-# echo "Random text file generated: random_text_10gb.txt"
+echo "All files generated."
