@@ -56,20 +56,10 @@ Follow these steps to set up and run the project:
 
 **Scalability**
 
-<div style="display: flex;">
-  <div style="flex: 50%; padding: 5px;">
-    <figure>
-      <img src="figures/strong_scale.png" alt="Strong scalability">
-      <figcaption>Strong scalability</figcaption>
-    </figure>
-  </div>
-  <div style="flex: 50%; padding: 5px;">
-    <figure>
-      <img src="figures/weak_scale.png" alt="Weak scalability">
-      <figcaption>Weak scalability</figcaption>
-    </figure>
-  </div>
-</div>
+| ![Strong scalability](figures/strong_scale.png) <br> **Figure 1:** Strong scalability | ![Weak scalability](figures/weak_scale.png) <br> **Figure 2:** Weak scalability |
+|:--:|:--:|
+| Strong scalability | Weak scalability |
+
 
 
 
