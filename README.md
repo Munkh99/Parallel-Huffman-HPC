@@ -43,9 +43,11 @@ Follow these steps to set up and run the project:
 ## Results
 
 **Runtime difference**
+
 ![Alt Text](figures/time_spent.png)
 
 **Data distribution**
+
 ![Alt Text](figures/data_distribution.jpg)
 
 **Runtime**
