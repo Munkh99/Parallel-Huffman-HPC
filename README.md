@@ -1,5 +1,5 @@
 # Parallel-Huffman-HPC
-Project repository for High Performance Computing for Data Science course UNITN
+Project repository of High Performance Computing for Data Science course UNITN
 
 ### Repository Structure
 
