@@ -23,7 +23,7 @@ Follow these steps to set up and run the project:
 - **Generate synthetic datasets**
   script file for generating synthetic datasets. It uses file_10M.txt (10 MB file) to generate 256MB to 16384MB datasets for fast generating. 
 ```
-./generate.sh
+  ./generate.sh
 ```
 - **Module load**
   ```
