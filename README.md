@@ -13,8 +13,7 @@ project_root/
 ├── huffman_encoding.c        # C source code for Huffman encoding
 ├── huffman_encoding.sh       # Shell script for Huffman encoding tasks
 ├── file_10M.txt             # Sample 10 MB text file
-└── parallel_huffman.pdf     # Project report document
-
+├── parallel_huffman.pdf     # Project report document
 │
 ```
 ## Getting Started
@@ -44,7 +43,6 @@ Follow these steps to set up and run the project:
 
 **Runtime difference**
 
-![Alt Text]()
 <img src="figures/time_spent.png" alt="Alt Text" width="500" />
 
 **Data distribution**
