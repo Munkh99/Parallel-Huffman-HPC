@@ -10,8 +10,8 @@ project_root/
 ├── LICENSE                  # Licensing information
 ├── README.md                # Introduction and instructions
 ├── generate.sh              # Shell script used for generating synthetic datasets 
-├── huffman_encoding.c        # C source code for Huffman encoding
-├── huffman_encoding.sh       # Shell script for Huffman encoding tasks
+├── huffman_encoding.c       # C source code for Huffman encoding
+├── huffman_encoding.sh      # Shell script for Huffman encoding tasks
 ├── file_10M.txt             # Sample 10 MB text file
 ├── parallel_huffman.pdf     # Project report document
 │
