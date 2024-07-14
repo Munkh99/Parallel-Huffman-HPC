@@ -614,8 +614,10 @@ int main(int argc, char** argv) {
 
 
     runtimes[6] = MPI_Wtime(); //Local data encoding
-    add_memeory_to_total(local_data_length * sizeof(char));
-    print_used_memory();
+    if (rank == 0){
+        add_memeory_to_total(local_data_length * sizeof(char));
+        print_used_memory();
+    }
 
     //############ 7. Encoded data gathering ############
 
