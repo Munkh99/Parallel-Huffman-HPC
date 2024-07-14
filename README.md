@@ -58,7 +58,6 @@ Follow these steps to set up and run the project:
 
 | ![Strong scalability](figures/strong_scale.png) <br> **Figure 1:** Strong scalability | ![Weak scalability](figures/weak_scale.png) <br> **Figure 2:** Weak scalability |
 |:--:|:--:|
-| Strong scalability | Weak scalability |
 
 
 
