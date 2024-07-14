@@ -54,6 +54,11 @@ Follow these steps to set up and run the project:
 | ![Runtime](figures/runtime.png) <br> **Figure 1:** Runtime | ![Speedup](figures/speedup.png) <br> **Figure 2:** Speedup | ![Speedup](figures/efficiency.png) <br> **Figure 3:** Efficiency |
 |:--:|:--:|:--:|
 
+![Alt Text](figures/runtime.jpg)
+![Alt Text](figures/speedup.jpg)
+![Alt Text](figures/efficiency.jpg)
+
+
 **Scalability**
 
 | ![Strong scalability](figures/strong_scale.png) <br> **Figure 1:** Strong scalability | ![Weak scalability](figures/weak_scale.png) <br> **Figure 2:** Weak scalability |
