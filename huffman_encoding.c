@@ -281,7 +281,6 @@ void print_byte_as_bits(unsigned char byte) {
 EncodedResult encodeData(char* local_buffer, size_t local_size, CodeEntry* dictionary, int dictionary_size) {
 
     size_t allocation_size = local_size;
-    // printf("Initial allocation size: %zu bytes\n", allocation_size);
     
     char* encoded_data = (char*) malloc(allocation_size * sizeof(char));
     if (encoded_data == NULL) {
@@ -408,24 +407,26 @@ int main(int argc, char** argv) {
     double runtimes[10]; // Array to store runtimes of different phases
 
     runtimes[0] = MPI_Wtime(); // Start timing
+
     // Check command line arguments [file, data]
     if (argc != 2) {
         if (rank == 0) {
             fprintf(stderr, "Usage: %s <input_file>\n", argv[0]);
         }
         MPI_Finalize();
-        return 1;
+        return EXIT_FAILURE;
     }
 
     //############ 1. File read ############
 
-    // Read data into 'data' variable only on rank 0
+    // Read data in rank 0
     if (rank == 0) {
         print_used_memory();
 
         // Read data from file
         if (readDataFromFile(argv[1], &data, &length) != 0){
-            MPI_Abort(MPI_COMM_WORLD, 1);
+            fprintf(stderr, "Error reading data from file %s on rank %d\n", argv[1], rank);
+            MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
         }
 
         add_memeory_to_total(length);
@@ -445,7 +446,7 @@ int main(int argc, char** argv) {
     // Synchronize all processes after file read
     MPI_Barrier(MPI_COMM_WORLD);
 
-    // calculates total number of partitions to be sent, num_send is number multiple sent, 1 means 1 time, 2 means 2 times 
+    // calculates total number of partitions to be sent
     int num_partitions = size;
     int num_send = 1; 
     if (length/size > INT_MAX) {
@@ -457,26 +458,24 @@ int main(int argc, char** argv) {
     size_t partitionSizes[num_partitions];
     size_t partitionOffsets[num_partitions];
     
+    // calculate partition sizes and offsets
     for (i = 0; i < num_partitions; ++i) {
         partitionSizes[i] = (length / num_partitions) + (i < length % num_partitions ? 1 : 0);
         partitionOffsets[i] = (i > 0 ? partitionOffsets[i - 1] + partitionSizes[i - 1] : 0);
     }
     if (rank == 0){
         printf("num_partitions: %d, split: %d\n", num_partitions, num_send);
-        for (i = 0; i < num_partitions; ++i) {
-            printf("%zu, %zu\n",partitionSizes[i], partitionOffsets[i]);
-        }
     }
 
-    // calculate total size fo each process for local data allocation 
+    // calculat total size for local data allocation
     for (i = rank * num_send; i < (rank+1) * num_send; ++i) {
-            local_data_length += partitionSizes[i];
+        local_data_length += partitionSizes[i];
     }
 
     // allocate memory for local data 
     local_data = (char *)malloc(local_data_length * sizeof(char)); 
     if (local_data == NULL) {
-        fprintf(stderr, "Memory allocation for local_data_buffer failed\n");
+        fprintf(stderr, "Memory allocation for local_data_buffer failed in rank: %d\n", rank);
         MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
     }
     if (rank == 0){
@@ -484,26 +483,25 @@ int main(int argc, char** argv) {
         print_used_memory();
     }
 
-    // Data sending part, root process sends to other processes
+    // Data sending/receiving. Root process sends to other processes, other processes receives from the root 
     if (rank == 0){
-        int dest;
         MPI_Request requests[(size - 1) * num_send];
         int request_count = 0;
 
+        // Send partitions to other processes
+        int dest;
         for(dest = 1; dest<size; ++dest){
             for(i = dest*num_send; i<(dest+1) * num_send; ++i){
                 MPI_Isend(data + partitionOffsets[i], partitionSizes[i], MPI_CHAR, dest, 0, MPI_COMM_WORLD, &requests[request_count]);
                 request_count++;
-                // printf("--%d %zu %zu\n", i, partitionSizes[i], partitionOffsets[i]);
             }
         }
 
-        // root process copies its own partitions 
+        // Copy its own partitions to local_data
         size_t offset = 0; // for local writer offset 
         for(i = 0; i<num_send; ++i){
             memcpy(local_data + offset, data + partitionOffsets[i], partitionSizes[i]*sizeof(char));
             offset += partitionSizes[i];
-            // printf("==%d %zu %zu\n",  i, partitionSizes[i], partitionOffsets[i]);
         }
 
         // Wait for all non-blocking sends to complete
@@ -511,20 +509,20 @@ int main(int argc, char** argv) {
         printf("Root process scattered all data.\n");
 
     }else{
-
-        MPI_Request requests[num_send]; // each process received num_send times recv
+        // Other processes receive data from root
+        MPI_Request requests[num_send]; // each process receives num_send times
         size_t offset = 0; // for local writer offset 
         for (i = rank * num_send; i < (rank + 1) * num_send; ++i) {
             MPI_Irecv(local_data + offset, partitionSizes[i], MPI_CHAR, 0, 0, MPI_COMM_WORLD, &requests[i - rank * num_send]);
             offset += partitionSizes[i];
-            // printf("==%d %d %zu %zu\n", rank, i, partitionSizes[i], partitionOffsets[i]);
         }
         // Wait for all non-blocking receives to complete
         MPI_Waitall(num_send, requests, MPI_STATUSES_IGNORE);
     }
     
-    local_data[local_data_length] = '\0';
-    // Debugging check to ensure scatter worked as expected
+    local_data[local_data_length] = '\0'; // Ensure local_data is null-terminated
+
+    // Assertion -  to ensure scatter worked as expected
     if (strlen(local_data) != local_data_length) {
         fprintf(stderr, "Error: Scatter data length mismatch\n");
         fprintf(stderr, "Local data: %s\n", local_data);
@@ -536,13 +534,15 @@ int main(int argc, char** argv) {
     
 
     //############ 3. Frequency calculation ############ 
-     // Allocate memory for local frequency in all processes
+
+    // Allocate memory for local frequency in all processes
     local_frequency = (unsigned long long int*) calloc(MAX_CHARS, sizeof(unsigned long long int));
     if (local_frequency == NULL) {
         fprintf(stderr, "Memory allocation failed for local_frequency on Rank %d\n", rank);
         MPI_Abort(MPI_COMM_WORLD, 1);
     }
     
+    // Allocate memory for frequency in root 
     if (rank == 0){
         frequency = (unsigned long long int*) calloc(MAX_CHARS, sizeof(unsigned long long int));
         add_memeory_to_total(MAX_CHARS * sizeof(unsigned long long int));
@@ -550,21 +550,21 @@ int main(int argc, char** argv) {
         print_used_memory();
     }
 
-
     // Calculate frequency in each process
     calculate_frequency(local_data, local_frequency, local_data_length);
  
-    //Gather local frequencies from all processes
+    //Gather local frequencies from all processes at root process
     MPI_Reduce(local_frequency, frequency, MAX_CHARS, MPI_UNSIGNED_LONG_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
-    
-    runtimes[3] = MPI_Wtime(); //Counting freq runtime
 
     // Synchronize all processes after frequency calculation
     MPI_Barrier(MPI_COMM_WORLD);
 
+    runtimes[3] = MPI_Wtime(); //Counting freq runtime
+
+
     //############ 4. Huffman Tree construction ############ 
 
-    // Root process (rank 0) builds Huffman tree and broadcasts it
+    // Root process builds Huffman tree and broadcasts it
     if (rank == 0) {
         // print_frequency(frequency); // for debug
 
@@ -589,12 +589,14 @@ int main(int argc, char** argv) {
         global_root = deserialize_tree(serialized_tree, &deserialization_index);
     }
 
-    runtimes[4] = MPI_Wtime(); //Huffman tree build
-
     // Synchronize all processes after broadcasting the Huffman tree
     MPI_Barrier(MPI_COMM_WORLD);
+
+    runtimes[4] = MPI_Wtime(); //Huffman tree build
     
+
     //############ 5. Huffman code generation ############
+
     // Build the code dictionary from the Huffman tree
     CodeEntry* dictionary = buildCodeDictionaryFromTree(global_root, &dictionary_size);
     
@@ -603,15 +605,15 @@ int main(int argc, char** argv) {
 
 
     //############ 6. Data encoding ############
+
     // each process encodes own local data usung huffman codes
     EncodedResult encoded_result = encodeData(local_data, local_data_length, dictionary, dictionary_size);
     printf("~rank: %d, local length: %zu, local bytes: %zu, encoded data len: %zu, encoded: total_bits : %zu\n", rank, strlen(local_data), local_data_length, encoded_result.total_bytes, encoded_result.total_bits);
 
-    if (rank == 0){
-        runtimes[6] = MPI_Wtime(); //Local data encoding
-        add_memeory_to_total(local_data_length * sizeof(char));
-        print_used_memory();
-    }
+
+    runtimes[6] = MPI_Wtime(); //Local data encoding
+    add_memeory_to_total(local_data_length * sizeof(char));
+    print_used_memory();
 
     //############ 7. Encoded data gathering ############
 
@@ -625,14 +627,17 @@ int main(int argc, char** argv) {
         }
     }
     MPI_Gather(&encoded_result.total_bits, 1, MPI_LONG_LONG, recvcounts_bit, 1, MPI_LONG_LONG, 0, MPI_COMM_WORLD);
- 
+    
+
     if (rank == 0) {
+        // Calculate total bytes required and allocate memory 
         for (i = 0; i < size; ++i) {
             recvcounts_byte[i] = (recvcounts_bit[i] + 7) / 8; // Round up to the nearest byte
             total_bytes += recvcounts_byte[i];
         }
 
-        printf("total_bytes: %zu\n", total_bytes); 
+        printf("Total_bytes: %zu\n", total_bytes); 
+
         gathered_encoded_data = (char*) malloc(total_bytes * sizeof(char));
         if (gathered_encoded_data == NULL) {
             fprintf(stderr, "Memory allocation for gathered_encoded_data failed\n");
@@ -642,6 +647,7 @@ int main(int argc, char** argv) {
         add_memeory_to_total(total_bytes * sizeof(char));
         print_used_memory();
 
+        // determine partitions for receiving encoded data
         int partition_cnt[size]; 
         num_partitions = 0;
         for(i = 0; i< size; ++i){
@@ -649,7 +655,7 @@ int main(int argc, char** argv) {
             num_partitions += k;
             partition_cnt[i] = k; 
         }
-
+        // Determine sizes and offsets for each partition
         size_t partition_sizes[num_partitions];
         size_t partition_offsets[num_partitions];
 
@@ -666,10 +672,8 @@ int main(int argc, char** argv) {
                 partition_index++;
             }
         }
-        for (i = 0; i<num_partitions; ++i){
-            printf("--- %d : %zu, %zu\n", i, partition_sizes[i], partition_offsets[i]);
-        }
 
+        // Initiate non-blocking receives for encoded data
         partition_index = partition_cnt[0];
         MPI_Request recv_requests[num_partitions - partition_cnt[0]];
         offset = 0;
@@ -699,19 +703,17 @@ int main(int argc, char** argv) {
 
         printf("Root process gathered all encoded data.\n");
    
-
-    }else{
-        // calculate number of partitions for local to send 
+    } else{
+        // calculate number of partitions for sending local encoded data 
         num_send = (encoded_result.total_bytes + INT_MAX - 1) / INT_MAX;
-        // allocate arrays for partition 
+
+        // allocate arrays for local partition sizes and offsets
         int local_partition_sizes[num_send];
         size_t local_partition_offsets[num_send];
 
-        // init 
+        // Compute sizes and offsets for each partition
         size_t offset = 0;
         size_t remaining = encoded_result.total_bytes;
-
-        // Compute sizes and offsets for each partition
         for (i = 0; i < num_send; ++i) {
             // Determine chunk size for current partition
             int chunk_size = (remaining > INT_MAX) ? INT_MAX : (int)remaining;
@@ -725,10 +727,8 @@ int main(int argc, char** argv) {
             remaining -= chunk_size;
         }
 
-        // Array of MPI_Request for non-blocking sends
+        // Initiate non-blocking sends of local encoded data to root process 
         MPI_Request send_requests[num_send];
-
-        // Initiate non-blocking sends to root process (rank 0)
         for (i = 0; i< num_send; i++){
             printf("----send %d, %d, %zu\n", rank, local_partition_sizes[i], local_partition_offsets[i]);
             MPI_Isend(encoded_result.encoded_data + local_partition_offsets[i], local_partition_sizes[i], MPI_CHAR,
@@ -751,10 +751,12 @@ int main(int argc, char** argv) {
         printf("Compresison sizes: %zu, %zu\n", total_bytes, length);
         // Save Huffman encoding to file
         saveHuffmanEncodingToFile( "huffman_compressed.txt", gathered_encoded_data, total_bytes);
+        // Write metadata to file 
         write_metadata("huffman_compressed_metadata.txt", recvcounts_byte, recvcounts_bit, size, frequency);
 
         runtimes[8] = MPI_Wtime(); //Writing file
 
+        // Cleanup allocated memory
         free(data);
         free(frequency);
         free(recvcounts_bit);
@@ -767,7 +769,7 @@ int main(int argc, char** argv) {
     free(local_data);
     free(local_frequency);
  
-    // Final timing info
+    // Final timing information output by rank 0
     if (rank == 0) {
         runtimes[9] = MPI_Wtime(); //end time
         
