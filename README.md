@@ -50,11 +50,10 @@ Follow these steps to set up and run the project:
 
 ![Alt Text](figures/data_distribution.jpg)
 
-**Runtime**
+**Runtime, speedup, efficiency**
 
-**Speedup**
-
-**Efficiency**
+| ![Runtime](figures/runtime.png) <br> **Figure 1:** Runtime | ![Speedup](figures/speedup.png) <br> **Figure 2:** Speedup[ |
+|:--:|:--:|
 
 **Scalability**
 
