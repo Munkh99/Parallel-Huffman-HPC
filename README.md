@@ -13,7 +13,7 @@ project_root/
 ├── huffman_encoding.c       # C source code for parallel Huffman encoding
 ├── huffman_encoding.sh      # Shell script for Huffman encoding tasks
 ├── file_10M.txt             # Sample 10 MB text file
-├── parallel_huffman_238399.pdf     # Project report document
+├── parallel_huffman.pdf     # Project report document
 │
 ```
 ## Getting Started
