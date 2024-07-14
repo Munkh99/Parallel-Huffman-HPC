@@ -54,10 +54,23 @@ Follow these steps to set up and run the project:
 
 **Efficiency**
 
-**Strong scalability**
-![Alt Text](figures/strong_scale.png)
-**Weak scalability**
-![Alt Text](figures/weak_scal.png)
+**Scalability**
+
+<div style="display: flex;">
+  <div style="flex: 50%; padding: 5px;">
+    <figure>
+      <img src="figures/strong_scale.png" alt="Strong scalability">
+      <figcaption>Strong scalability</figcaption>
+    </figure>
+  </div>
+  <div style="flex: 50%; padding: 5px;">
+    <figure>
+      <img src="figures/weak_scale.png" alt="Weak scalability">
+      <figcaption>Weak scalability</figcaption>
+    </figure>
+  </div>
+</div>
+
 
 
 
