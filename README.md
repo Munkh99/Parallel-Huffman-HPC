@@ -50,6 +50,7 @@ Follow these steps to set up and run the project:
 <img src="figures/data_distribution.jpg" alt="Alt Text" width="500" />
 
 **Runtime, speedup, efficiency**
+
 Asterisks (*) indicate multiple sends due to integer constraints in MPI.
 
 | ![Runtime](figures/runtime.png) <br> **Figure 3:** Runtime | ![Speedup](figures/speedup.png) <br> **Figure 4:** Speedup | ![Speedup](figures/efficiency.png) <br> **Figure 5:** Efficiency |
