@@ -608,7 +608,9 @@ int main(int argc, char** argv) {
 
     // each process encodes own local data usung huffman codes
     EncodedResult encoded_result = encodeData(local_data, local_data_length, dictionary, dictionary_size);
-    printf("~rank: %d, local length: %zu, local bytes: %zu, encoded data len: %zu, encoded: total_bits : %zu\n", rank, strlen(local_data), local_data_length, encoded_result.total_bytes, encoded_result.total_bits);
+   
+    // for debugging
+    // printf("~rank: %d, local length: %zu, local bytes: %zu, encoded data len: %zu, encoded: total_bits : %zu\n", rank, strlen(local_data), local_data_length, encoded_result.total_bytes, encoded_result.total_bits);
 
 
     runtimes[6] = MPI_Wtime(); //Local data encoding
