@@ -21,8 +21,9 @@ project_root/
 Follow these steps to set up and run the project:
 
 - **Generate synthetic datasets**
-  script file for generating synthetic datasets. It uses file_10M.txt (10 MB file) to generate 256MB to 16384MB datasets for fast generating. 
+  script file for generating synthetic datasets. It uses file_10M.txt (10 MB) to generate 256MB to 16384MB datasets for fast generating. 
 ```
+  chmod +x generate.sh
   ./generate.sh
 ```
 - **Module load**
@@ -38,6 +39,25 @@ Follow these steps to set up and run the project:
 ```
   qsub huffman_encoding.sh
 ```
+
+## Results
+
+**Runtime difference**
+![Alt Text](figures/time_spent.png)
+
+**Data distribution**
+![Alt Text](figures/data_distribution.jpg)
+
+**Runtime**
+
+**Speedup**
+
+**Efficiency**
+
+**Strong scalability**
+![Alt Text](figures/strong_scale.png)
+**Weak scalability**
+![Alt Text](figures/weak_scal.png)
 
 
 
