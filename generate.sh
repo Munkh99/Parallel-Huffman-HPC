@@ -4,7 +4,7 @@
 SOURCE_FILE="file_10M.txt"
 
 # Define the sizes for the output files in bytes
-TARGET_SIZES=(128 256 512 1024 2048 4096)  # in MB
+TARGET_SIZES=(256 512 1024 2048 4096 8192 16384)  # in MB
 
 # Loop through each target size
 for SIZE_MB in "${TARGET_SIZES[@]}"
