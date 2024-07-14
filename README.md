@@ -44,11 +44,12 @@ Follow these steps to set up and run the project:
 
 **Runtime difference**
 
-![Alt Text](figures/time_spent.png)
+![Alt Text]()
+<img src="figures/time_spent.png" alt="Alt Text" width="500" />
 
 **Data distribution**
 
-<img src="figures/data_distribution.jpg" alt="Alt Text" width="400" />
+<img src="figures/data_distribution.jpg" alt="Alt Text" width="500" />
 
 **Runtime, speedup, efficiency**
 
