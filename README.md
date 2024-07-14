@@ -6,11 +6,11 @@ Project repository for High Performance Computing for Data Science course UNITN'
 ```plaintext
 project_root/
 │
-├── figures/                 # Directory for figures and images
+├── figures/                 # Directory for figures
 ├── LICENSE                  # Licensing information
 ├── README.md                # Introduction and instructions
 ├── generate.sh              # Shell script used for generating synthetic datasets 
-├── huffman_encoding.c       # C source code for Huffman encoding
+├── huffman_encoding.c       # C source code for parallel Huffman encoding
 ├── huffman_encoding.sh      # Shell script for Huffman encoding tasks
 ├── file_10M.txt             # Sample 10 MB text file
 ├── parallel_huffman.pdf     # Project report document
@@ -19,25 +19,26 @@ project_root/
 ## Getting Started
 Follow these steps to set up and run the project:
 
-- **Generate synthetic datasets**
-  script file for generating synthetic datasets. It uses file_10M.txt (10 MB) to generate 256MB to 16384MB datasets for fast generating. 
-```
+- **Generate Synthetic Datasets**
+  The `generate.sh` script generates synthetic datasets using `file_10M.txt` (10 MB) to create datasets ranging from 256 MB to 16384 MB for faster generation
+  ```
   chmod +x generate.sh
   ./generate.sh
-```
-- **Module load**
+  ```
+- **Module Load**
   ```
   module load mpich-3.2
   ```
-- **Code compile**
+- **Code Compilation**
   ```
   mpicc -g -Wall -o huffman_encoding huffman_encoding.c
   ```
 - **PBS job instruction and submission**
-  Set the number of chunks, cores, wall time, dataset, etc, as you prefer. And call the following code: 
-```
-  qsub huffman_encoding.sh
-```
+
+  Set parameters such as the number of chunks, cores, walltime, dataset size, etc in `huffman_encoding.sh`, and submit the job using the following command. 
+  ```
+    qsub huffman_encoding.sh
+  ```
 
 ## Results
 
