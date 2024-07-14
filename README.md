@@ -45,7 +45,7 @@ Follow these steps to set up and run the project:
 
 <img src="figures/time_spent.png" alt="Alt Text" width="500" />
 
-**Data distribution**
+**Data distribution and gathering**
 
 <img src="figures/data_distribution.jpg" alt="Alt Text" width="500" />
 
