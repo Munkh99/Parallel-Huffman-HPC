@@ -7,5 +7,4 @@
 #PBS -q short_cpuQ
 
 module load mpich-3.2
-
 mpirun.actual -n 32 ./huffman_encoding file_512M.txt
