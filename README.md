@@ -52,8 +52,8 @@ Follow these steps to set up and run the project:
 
 **Runtime, speedup, efficiency**
 
-| ![Runtime](figures/runtime.png) <br> **Figure 1:** Runtime | ![Speedup](figures/speedup.png) <br> **Figure 2:** Speedup[ |
-|:--:|:--:|
+| ![Runtime](figures/runtime.png) <br> **Figure 1:** Runtime | ![Speedup](figures/speedup.png) <br> **Figure 2:** Speedup[ | ![Speedup](figures/efficiency.png) <br> **Figure 3:** Efficiency[ |
+|:--:|:--:|:--:|
 
 **Scalability**
 
