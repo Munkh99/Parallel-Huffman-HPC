@@ -3,28 +3,41 @@ Project repository for High Performance Computing for Data Science course UNITN'
 
 ### Repository Structure
 
-- **LICENSE**  
-  This file contains the license under which the repository's contents are distributed.
+```plaintext
+project_root/
+│
+├── LICENSE                  # Licensing information
+├── README.md                # Introduction and instructions
+├── generate.sh              # Shell script used for generating synthetic datasets 
+├── huffman_encoding.c        # C source code for Huffman encoding
+├── huffman_encoding.sh       # Shell script for Huffman encoding tasks
+├── file_10M.txt             # Sample 10 MB text file
+├── figures/                 # Directory for figures and images
+└── parallel_huffman.pdf     # Project report document
 
-- **README.md**  
-  This file provides an introduction to the repository, instructions on usage, and any other relevant information.
+│
+```
+## Getting Started
+Follow these steps to set up and run the project:
 
-- **generate.sh**  
-  Shell script used for generating synthetic datasets using file_10M.txt 
+- **Generate synthetic datasets**
+  script file for generating synthetic datasets. It uses file_10M.txt (10 MB file) to generate 256MB to 16384MB datasets for fast generating. 
+```
+./generate.sh
+```
+- **Module load**
+  ```
+  module load mpich-3.2
+  ```
+- **Code compile**
+  ```
+  mpicc -g -Wall -o huffman_encoding huffman_encoding.c
+  ```
+- **PBS job instruction and submission**
+  Set the number of chunks, cores, wall time, dataset, etc, as you prefer. And call the following code: 
+```
+  qsub huffman_encoding.sh
+```
 
-- **huffman_encoding.c**  
-  C source code file implementing Huffman encoding algorithm.
-
-- **huffman_encoding.sh**  
-  Shell script for running Huffman encoding - PBS job instruction
-
-- **file_10M.txt**  
-  Sample text file (10 MB in size) used for generating the large datasets
-
-- **Parallel_huffman.pdf**
-  Project report document
-  
-- **figures/**  
-  Directory containing figures or images related to the project
 
 
